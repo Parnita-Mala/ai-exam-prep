@@ -7,14 +7,14 @@ export interface Question {
   topic: string;
 }
 
-export async function generateQuestions(examName: string, count: number = 5): Promise<Question[]> {
+export async function generateQuestions(examName: string, count: number = 10, difficulty: string = 'Medium'): Promise<Question[]> {
   try {
     const response = await fetch('/api/generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ examName, count }),
+      body: JSON.stringify({ examName, count, difficulty }),
     });
 
     if (!response.ok) {

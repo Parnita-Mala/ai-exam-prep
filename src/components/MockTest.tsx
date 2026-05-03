@@ -5,6 +5,8 @@ import styles from './MockTest.module.css';
 interface MockTestProps {
   examId: string;
   examName: string;
+  questionCount: number;
+  difficulty: string;
   onBack: () => void;
 }
 
@@ -32,12 +34,12 @@ const LatexText: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
+const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, difficulty, onBack }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [timeLeft, setTimeLeft] = useState(1800);
+  const [timeLeft, setTimeLeft] = useState(questionCount * 120); // 2 mins per question
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showRevision, setShowRevision] = useState(false);
@@ -45,14 +47,14 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
   useEffect(() => {
     async function loadQuestions() {
       setLoading(true);
-      const aiQuestions = await generateQuestions(examName, 10);
+      const aiQuestions = await generateQuestions(examName, questionCount, difficulty);
       if (aiQuestions.length > 0) {
         setQuestions(aiQuestions);
       }
       setLoading(false);
     }
     loadQuestions();
-  }, [examName]);
+  }, [examName, questionCount, difficulty]);
 
   useEffect(() => {
     if (timeLeft > 0 && !isSubmitted) {

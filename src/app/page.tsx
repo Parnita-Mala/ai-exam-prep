@@ -21,6 +21,8 @@ const EXAMS = [
 
 export default function Home() {
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
+  const [config, setConfig] = useState<{ count: number; difficulty: string } | null>(null);
+  const [tempConfig, setTempConfig] = useState<{ count: number; difficulty: string }>({ count: 10, difficulty: 'Medium' });
   const [session, setSession] = useState<any>(null);
 
   React.useEffect(() => {
@@ -37,6 +39,11 @@ export default function Home() {
 
   const handleSelectExam = (id: string) => {
     setSelectedExam(id);
+    setTempConfig({ count: 10, difficulty: 'Medium' });
+  };
+
+  const startTest = () => {
+    setConfig(tempConfig);
   };
 
   if (!session) {
@@ -57,7 +64,7 @@ export default function Home() {
 
   return (
     <AnimatePresence mode="wait">
-      {selectedExam ? (
+      {selectedExam && config && (
         <motion.main 
           key="test"
           initial={{ opacity: 0, x: 20 }}
@@ -69,10 +76,99 @@ export default function Home() {
           <MockTest 
             examId={selectedExam} 
             examName={EXAMS.find(e => e.id === selectedExam)?.name || ''} 
-            onBack={() => setSelectedExam(null)} 
+            questionCount={config.count}
+            difficulty={config.difficulty}
+            onBack={() => {
+              setSelectedExam(null);
+              setConfig(null);
+            }} 
           />
         </motion.main>
-      ) : (
+      )}
+
+      {selectedExam && !config && (
+        <motion.div 
+          key="config"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-card"
+          style={{ 
+            position: 'fixed', 
+            top: '50%', 
+            left: '50%', 
+            transform: 'translate(-50%, -50%)',
+            zIndex: 1000,
+            padding: '3rem',
+            width: '100%',
+            maxWidth: '500px',
+            textAlign: 'center'
+          }}
+        >
+          <h2 style={{ marginBottom: '2rem' }}>Configure Your {EXAMS.find(e => e.id === selectedExam)?.name} Test</h2>
+          
+          <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Difficulty Level</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+              {['Easy', 'Medium', 'Hard', 'Expert'].map(d => (
+                <button 
+                  key={d}
+                  onClick={() => setTempConfig({ ...tempConfig, difficulty: d })}
+                  style={{ 
+                    padding: '0.75rem', 
+                    borderRadius: '12px', 
+                    background: tempConfig.difficulty === d ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem'
+                  }}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '2.5rem', textAlign: 'left' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Number of Questions</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+              {[10, 20, 30, 50].map(c => (
+                <button 
+                  key={c}
+                  onClick={() => setTempConfig({ ...tempConfig, count: c })}
+                  style={{ 
+                    padding: '0.75rem', 
+                    borderRadius: '12px', 
+                    background: tempConfig.count === c ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button 
+              onClick={() => setSelectedExam(null)}
+              style={{ flex: 1, padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: 'none', cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={startTest}
+              style={{ flex: 2, padding: '1rem', borderRadius: '12px', background: 'var(--primary)', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Start Mock Test
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      {!selectedExam && (
         <motion.main 
           key="dashboard"
           initial={{ opacity: 0, y: 10 }}
