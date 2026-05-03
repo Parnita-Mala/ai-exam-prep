@@ -124,9 +124,11 @@ export default function Home() {
             left: '50%', 
             transform: 'translate(-50%, -50%)',
             zIndex: 1000,
-            padding: '3rem',
-            width: '100%',
+            padding: '2rem 3rem',
+            width: '90%',
             maxWidth: '550px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
             textAlign: 'center'
           }}
         >
