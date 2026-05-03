@@ -10,6 +10,7 @@ interface MockTestProps {
 
 import { generateQuestions, Question } from '@/lib/ai';
 import { Loader2 } from 'lucide-react';
+import RevisionSchedule from './RevisionSchedule';
 
 const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -19,6 +20,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
   const [timeLeft, setTimeLeft] = useState(1800);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showRevision, setShowRevision] = useState(false);
 
   useEffect(() => {
     async function loadQuestions() {
@@ -87,6 +89,18 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
     return score;
   };
 
+  if (showRevision) {
+    return (
+      <div className={styles.analysisContainer}>
+        <div className={styles.analysisHeader}>
+          <button onClick={() => setShowRevision(false)} className={styles.backBtn}><ChevronLeft size={20} /> Back to Analysis</button>
+          <h2>Revision Plan</h2>
+        </div>
+        <RevisionSchedule />
+      </div>
+    );
+  }
+
   if (showAnalysis) {
     return (
       <div className={styles.analysisContainer}>
@@ -137,7 +151,12 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
                   </div>
                 ))}
               </div>
-              <button className={styles.scheduleBtn}>Generate Revision Schedule</button>
+              <button 
+                className={styles.scheduleBtn}
+                onClick={() => setShowRevision(true)}
+              >
+                Generate Revision Schedule
+              </button>
             </div>
           </aside>
         </div>
