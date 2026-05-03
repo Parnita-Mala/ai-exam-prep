@@ -45,7 +45,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
   useEffect(() => {
     async function loadQuestions() {
       setLoading(true);
-      const aiQuestions = await generateQuestions(examName, 5);
+      const aiQuestions = await generateQuestions(examName, 10);
       if (aiQuestions.length > 0) {
         setQuestions(aiQuestions);
       }
