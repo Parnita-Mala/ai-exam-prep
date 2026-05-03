@@ -15,6 +15,7 @@ import { generateQuestions, Question } from '@/lib/ai';
 import { Loader2, Bookmark, BookmarkCheck } from 'lucide-react';
 import RevisionSchedule from './RevisionSchedule';
 import { InlineMath, BlockMath } from 'react-katex';
+import { supabase } from '@/lib/supabase';
 
 const LatexText: React.FC<{ text: string }> = ({ text }) => {
   if (!text) return null;
@@ -100,17 +101,36 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
     setAnswers({ ...answers, [currentQuestion.id]: idx });
   };
 
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-    setShowAnalysis(true);
-  };
-
   const calculateScore = () => {
     let score = 0;
     questions.forEach(q => {
       if (answers[q.id] === q.correctAnswer) score++;
     });
     return score;
+  };
+
+  const handleSubmit = async () => {
+    const score = calculateScore();
+    setIsSubmitted(true);
+    setShowAnalysis(true);
+
+    // Save to Supabase
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { error } = await supabase.from('test_results').insert({
+          user_id: session.user.id,
+          exam_name: examName,
+          subject: subject,
+          score: score,
+          total_questions: questions.length,
+          difficulty: difficulty
+        });
+        if (error) console.error("Error saving score:", error);
+      }
+    } catch (err) {
+      console.error("Failed to save results:", err);
+    }
   };
 
   if (showRevision) {

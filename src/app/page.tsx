@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ExamCard from '@/components/ExamCard';
 import MockTest from '@/components/MockTest';
 import RevisionSchedule from '@/components/RevisionSchedule';
+import PerformanceChart from '@/components/PerformanceChart';
 import { supabase } from '@/lib/supabase';
 import Auth from '@/components/Auth';
 
@@ -28,18 +29,38 @@ export default function Home() {
     subject: 'Full Mock Test'
   });
   const [session, setSession] = useState<any>(null);
+  const [testHistory, setTestHistory] = useState<any[]>([]);
 
   React.useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) fetchHistory(session.user.id);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) fetchHistory(session.user.id);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchHistory = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('test_results')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
+      .limit(10);
+    
+    if (data) {
+      const formatted = data.map(item => ({
+        date: new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        score: Math.round((item.score / item.total_questions) * 100)
+      }));
+      setTestHistory(formatted);
+    }
+  };
 
   const handleSelectExam = (id: string) => {
     setSelectedExam(id);
@@ -252,7 +273,7 @@ export default function Home() {
               </p>
             </motion.header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '3rem', marginBottom: '6rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '3rem', marginBottom: '6rem' }}>
               <section style={{ 
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
@@ -278,7 +299,16 @@ export default function Home() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <RevisionSchedule />
+                <div className="glass-card" style={{ padding: '1.5rem' }}>
+                  <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <BarChart3 size={20} color="var(--primary)" />
+                    Performance Trend (%)
+                  </h3>
+                  <PerformanceChart data={testHistory} />
+                </div>
+                <div style={{ marginTop: '2rem' }}>
+                  <RevisionSchedule />
+                </div>
               </motion.aside>
             </div>
 
