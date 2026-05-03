@@ -266,7 +266,7 @@ export default function Home() {
               style={{ textAlign: 'center', marginBottom: '4rem' }}
             >
               <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                AI Competitive Exam Prep
+                AI Competitive Exam Prep v4.0
               </h1>
               <p style={{ color: 'var(--text-muted)', fontSize: '1.25rem', maxWidth: '700px', margin: '0 auto' }}>
                 Master your goals with AI-powered mock tests, step-by-step solutions, and personalized revision schedules.
