@@ -1,11 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || "placeholder");
+const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey || "");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function POST(request: Request) {
   try {
+    if (!apiKey) {
+      return NextResponse.json({ error: "API Key not configured" }, { status: 401 });
+    }
     const { question, context, history } = await request.json();
 
     const prompt = `The student is asking a follow-up question about a mock test problem.
