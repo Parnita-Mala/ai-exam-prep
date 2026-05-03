@@ -120,16 +120,20 @@ export default function Home() {
           className="glass-card"
           style={{ 
             position: 'fixed', 
-            top: '50%', 
+            top: '2rem', 
             left: '50%', 
-            transform: 'translate(-50%, -50%)',
+            transform: 'translateX(-50%)',
             zIndex: 1000,
-            padding: '2rem 3rem',
-            width: '90%',
-            maxWidth: '550px',
-            maxHeight: '90vh',
+            padding: '1.5rem 2rem',
+            width: '95%',
+            maxWidth: '500px',
+            maxHeight: 'calc(100vh - 4rem)',
             overflowY: 'auto',
-            textAlign: 'center'
+            textAlign: 'center',
+            backgroundColor: '#1a1a1a',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '24px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
           }}
         >
           <h2 style={{ marginBottom: '2rem' }}>Configure Your {EXAMS.find(e => e.id === selectedExam)?.name} Test</h2>
@@ -268,7 +272,7 @@ export default function Home() {
               style={{ textAlign: 'center', marginBottom: '4rem' }}
             >
               <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                AI Competitive Exam Prep v4.0
+                AI Competitive Exam Prep
               </h1>
               <p style={{ color: 'var(--text-muted)', fontSize: '1.25rem', maxWidth: '700px', margin: '0 auto' }}>
                 Master your goals with AI-powered mock tests, step-by-step solutions, and personalized revision schedules.
