@@ -12,8 +12,9 @@ interface MockTestProps {
 }
 
 import { generateQuestions, Question } from '@/lib/ai';
-import { Loader2, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Loader2, Bookmark, BookmarkCheck, MessageSquare } from 'lucide-react';
 import RevisionSchedule from './RevisionSchedule';
+import AIDoubtSolver from './AIDoubtSolver';
 import { InlineMath, BlockMath } from 'react-katex';
 import { supabase } from '@/lib/supabase';
 
@@ -46,6 +47,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showRevision, setShowRevision] = useState(false);
+  const [activeDoubt, setActiveDoubt] = useState<Question | null>(null);
 
   useEffect(() => {
     async function loadQuestions() {
@@ -159,8 +161,28 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
             {questions.map((q, idx) => (
               <div key={q.id} className={styles.analysisCard}>
                 <div className={styles.qHeader}>
-                  <span className={styles.qNum}>Question {idx + 1}</span>
-                  <span className={styles.topicTag}>{q.topic}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <span className={styles.qNum}>Question {idx + 1}</span>
+                    <span className={styles.topicTag}>{q.topic}</span>
+                  </div>
+                  <button 
+                    onClick={() => setActiveDoubt(q)}
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem', 
+                      padding: '0.5rem 1rem', 
+                      borderRadius: '8px', 
+                      background: 'rgba(59, 130, 246, 0.1)', 
+                      color: '#3b82f6',
+                      border: '1px solid rgba(59, 130, 246, 0.2)',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      fontWeight: 600
+                    }}
+                  >
+                    <MessageSquare size={14} /> Ask AI
+                  </button>
                 </div>
                 <div className={styles.qText}><LatexText text={q.text} /></div>
                 <div className={styles.optionsList}>
@@ -204,6 +226,14 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
             </div>
           </aside>
         </div>
+
+        {activeDoubt && (
+          <AIDoubtSolver 
+            questionText={activeDoubt.text}
+            explanation={activeDoubt.explanation}
+            onClose={() => setActiveDoubt(null)}
+          />
+        )}
       </div>
     );
   }
