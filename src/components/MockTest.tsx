@@ -11,6 +11,26 @@ interface MockTestProps {
 import { generateQuestions, Question } from '@/lib/ai';
 import { Loader2 } from 'lucide-react';
 import RevisionSchedule from './RevisionSchedule';
+import { InlineMath, BlockMath } from 'react-katex';
+
+const LatexText: React.FC<{ text: string }> = ({ text }) => {
+  if (!text) return null;
+  
+  // Split text by $ delimiters
+  const parts = text.split(/(\$.*?\$)/g);
+  
+  return (
+    <span>
+      {parts.map((part, idx) => {
+        if (part.startsWith('$') && part.endsWith('$')) {
+          const math = part.slice(1, -1);
+          return <InlineMath key={idx} math={math} />;
+        }
+        return <span key={idx}>{part}</span>;
+      })}
+    </span>
+  );
+};
 
 const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -118,14 +138,14 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
                   <span className={styles.qNum}>Question {idx + 1}</span>
                   <span className={styles.topicTag}>{q.topic}</span>
                 </div>
-                <p className={styles.qText}>{q.text}</p>
+                <div className={styles.qText}><LatexText text={q.text} /></div>
                 <div className={styles.optionsList}>
                   {q.options.map((opt, oIdx) => {
                     const isCorrect = oIdx === q.correctAnswer;
                     const isSelected = answers[q.id] === oIdx;
                     return (
                       <div key={oIdx} className={`${styles.option} ${isCorrect ? styles.correct : ''} ${isSelected && !isCorrect ? styles.wrong : ''}`}>
-                        {opt}
+                        <LatexText text={opt} />
                         {isCorrect && <CheckCircle2 size={16} className={styles.statusIcon} />}
                         {isSelected && !isCorrect && <AlertCircle size={16} className={styles.statusIcon} />}
                       </div>
@@ -134,7 +154,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
                 </div>
                 <div className={styles.explanation}>
                   <strong>AI Explanation:</strong>
-                  <p>{q.explanation}</p>
+                  <div style={{ marginTop: '0.5rem' }}><LatexText text={q.explanation} /></div>
                 </div>
               </div>
             ))}
@@ -187,7 +207,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
               <span className={styles.qNum}>Question {currentIdx + 1} of {questions.length}</span>
               <span className={styles.topicTag}>{currentQuestion.topic}</span>
             </div>
-            <p className={styles.questionText}>{currentQuestion.text}</p>
+            <div className={styles.questionText}><LatexText text={currentQuestion.text} /></div>
             <div className={styles.optionsGrid}>
               {currentQuestion.options.map((option, idx) => (
                 <button 
@@ -196,7 +216,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
                   onClick={() => handleOptionSelect(idx)}
                 >
                   <span className={styles.optionLabel}>{String.fromCharCode(65 + idx)}</span>
-                  {option}
+                  <LatexText text={option} />
                 </button>
               ))}
             </div>

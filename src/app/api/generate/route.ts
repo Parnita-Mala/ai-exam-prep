@@ -10,13 +10,14 @@ export async function POST(request: Request) {
 
     const prompt = `Generate ${count} practice questions for the ${examName} exam. 
   Each question should match the actual exam pattern and difficulty.
+  IMPORTANT: Use LaTeX for all mathematical formulas, symbols, and variables (e.g., use $E=mc^2$ instead of E=mc2).
   Return the output strictly as a JSON array of objects with the following structure:
   {
     "id": number,
-    "text": "string",
+    "text": "string (with LaTeX math)",
     "options": ["option1", "option2", "option3", "option4"],
     "correctAnswer": index (0-3),
-    "explanation": "step-by-step solution",
+    "explanation": "step-by-step solution (with LaTeX math)",
     "topic": "specific sub-topic"
   }
   Do not include any markdown formatting or extra text outside the JSON.`;
