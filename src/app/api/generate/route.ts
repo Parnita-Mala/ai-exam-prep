@@ -70,9 +70,8 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("API Route Error:", error);
     return NextResponse.json({ 
-      error: "Failed to generate questions",
-      message: error.message,
-      stack: error.stack?.split('\n').slice(0, 3).join('\n')
+      error: error.message || "Failed to generate questions",
+      details: error.toString()
     }, { status: 500 });
   }
 }
