@@ -26,12 +26,29 @@ export async function POST(request: Request) {
     const response = await result.response;
     const text = response.text();
     
-    // Clean markdown if present
-    const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    // More robust JSON extraction: Find the first '[' and the last ']'
+    const startIndex = text.indexOf('[');
+    const endIndex = text.lastIndexOf(']');
     
-    return NextResponse.json(JSON.parse(cleanJson));
-  } catch (error) {
+    if (startIndex === -1 || endIndex === -1) {
+      console.error("AI returned invalid format (no JSON array found):", text);
+      return NextResponse.json({ error: "Invalid AI response format" }, { status: 500 });
+    }
+    
+    const jsonString = text.substring(startIndex, endIndex + 1);
+    
+    try {
+      const parsed = JSON.parse(jsonString);
+      return NextResponse.json(parsed);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError, "Original text:", text);
+      return NextResponse.json({ error: "Failed to parse AI response" }, { status: 500 });
+    }
+  } catch (error: any) {
     console.error("API Route Error:", error);
-    return NextResponse.json({ error: "Failed to generate questions" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Failed to generate questions",
+      details: error.message 
+    }, { status: 500 });
   }
 }
