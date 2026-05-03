@@ -31,11 +31,21 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
     }
     loadQuestions();
   }, [examName]);
+
+  useEffect(() => {
+    if (timeLeft > 0 && !isSubmitted) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0 && !isSubmitted) {
+      handleSubmit();
+    }
+  }, [timeLeft, isSubmitted]);
+
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <Loader2 className={styles.spinner} size={48} />
-        <h2>AI is generating your mock test...</h2>
+        <Loader2 className={styles.spinner} size={48} style={{ color: '#3b82f6' }} />
+        <h2>AI is generating your mock test... (v3.0)</h2>
         <p>Analyzing {examName} patterns and difficulty levels</p>
       </div>
     );
@@ -52,15 +62,6 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, onBack }) => {
   }
 
   const currentQuestion = questions[currentIdx];
-
-  useEffect(() => {
-    if (timeLeft > 0 && !isSubmitted) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && !isSubmitted) {
-      handleSubmit();
-    }
-  }, [timeLeft, isSubmitted]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
