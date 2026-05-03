@@ -74,7 +74,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
     return (
       <div className={styles.loadingContainer}>
         <Loader2 className={styles.spinner} size={48} style={{ color: '#3b82f6' }} />
-        <h2>AI is generating your mock test... (v3.0)</h2>
+        <h2>AI is generating your mock test... (v4.0)</h2>
         <p>Analyzing {examName} patterns and difficulty levels</p>
       </div>
     );
