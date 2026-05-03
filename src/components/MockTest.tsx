@@ -7,11 +7,12 @@ interface MockTestProps {
   examName: string;
   questionCount: number;
   difficulty: string;
+  subject: string;
   onBack: () => void;
 }
 
 import { generateQuestions, Question } from '@/lib/ai';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Bookmark, BookmarkCheck } from 'lucide-react';
 import RevisionSchedule from './RevisionSchedule';
 import { InlineMath, BlockMath } from 'react-katex';
 
@@ -34,11 +35,12 @@ const LatexText: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, difficulty, onBack }) => {
+const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, difficulty, subject, onBack }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [marked, setMarked] = useState<Record<number, boolean>>({});
   const [timeLeft, setTimeLeft] = useState(questionCount * 120); // 2 mins per question
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -47,14 +49,14 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
   useEffect(() => {
     async function loadQuestions() {
       setLoading(true);
-      const aiQuestions = await generateQuestions(examName, questionCount, difficulty);
+      const aiQuestions = await generateQuestions(examName, questionCount, difficulty, subject);
       if (aiQuestions.length > 0) {
         setQuestions(aiQuestions);
       }
       setLoading(false);
     }
     loadQuestions();
-  }, [examName, questionCount, difficulty]);
+  }, [examName, questionCount, difficulty, subject]);
 
   useEffect(() => {
     if (timeLeft > 0 && !isSubmitted) {
@@ -206,8 +208,17 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
         <div className={styles.questionSection}>
           <div className="glass-card" style={{ padding: '2.5rem', minHeight: '400px' }}>
             <div className={styles.qHeader}>
-              <span className={styles.qNum}>Question {currentIdx + 1} of {questions.length}</span>
-              <span className={styles.topicTag}>{currentQuestion.topic}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <span className={styles.qNum}>Question {currentIdx + 1} of {questions.length}</span>
+                <span className={styles.topicTag}>{currentQuestion.topic}</span>
+              </div>
+              <button 
+                className={`${styles.markBtn} ${marked[currentQuestion.id] ? styles.isMarked : ''}`}
+                onClick={() => setMarked({ ...marked, [currentQuestion.id]: !marked[currentQuestion.id] })}
+              >
+                {marked[currentQuestion.id] ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+                {marked[currentQuestion.id] ? 'Marked' : 'Mark for Review'}
+              </button>
             </div>
             <div className={styles.questionText}><LatexText text={currentQuestion.text} /></div>
             <div className={styles.optionsGrid}>
@@ -249,7 +260,12 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
               {questions.map((q, idx) => (
                 <button 
                   key={q.id}
-                  className={`${styles.paletteItem} ${currentIdx === idx ? styles.active : ''} ${answers[q.id] !== undefined ? styles.answered : ''}`}
+                  className={`
+                    ${styles.paletteItem} 
+                    ${currentIdx === idx ? styles.active : ''} 
+                    ${answers[q.id] !== undefined ? styles.answered : ''}
+                    ${marked[q.id] ? styles.marked : ''}
+                  `}
                   onClick={() => setCurrentIdx(idx)}
                 >
                   {idx + 1}
@@ -258,6 +274,7 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
             </div>
             <div className={styles.legend}>
               <div className={styles.legendItem}><span className={`${styles.dot} ${styles.answered}`}></span> Answered</div>
+              <div className={styles.legendItem}><span className={`${styles.dot} ${styles.marked}`}></span> For Review</div>
               <div className={styles.legendItem}><span className={styles.dot}></span> Unvisited</div>
             </div>
           </div>

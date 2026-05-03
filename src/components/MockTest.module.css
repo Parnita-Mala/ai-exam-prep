@@ -218,11 +218,39 @@
   color: white;
 }
 
-.legend {
-  margin-top: 2rem;
+.markBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.markBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.markBtn.isMarked {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: #8b5cf6;
+  color: #a78bfa;
+}
+
+.paletteItem.marked {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: white;
+}
+
+.dot.marked {
+  background: #8b5cf6;
 }
 
 .legendItem {

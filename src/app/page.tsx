@@ -21,8 +21,12 @@ const EXAMS = [
 
 export default function Home() {
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
-  const [config, setConfig] = useState<{ count: number; difficulty: string } | null>(null);
-  const [tempConfig, setTempConfig] = useState<{ count: number; difficulty: string }>({ count: 10, difficulty: 'Medium' });
+  const [config, setConfig] = useState<{ count: number; difficulty: string; subject: string } | null>(null);
+  const [tempConfig, setTempConfig] = useState<{ count: number; difficulty: string; subject: string }>({ 
+    count: 10, 
+    difficulty: 'Medium',
+    subject: 'Full Mock Test'
+  });
   const [session, setSession] = useState<any>(null);
 
   React.useEffect(() => {
@@ -39,7 +43,7 @@ export default function Home() {
 
   const handleSelectExam = (id: string) => {
     setSelectedExam(id);
-    setTempConfig({ count: 10, difficulty: 'Medium' });
+    setTempConfig({ count: 10, difficulty: 'Medium', subject: 'Full Mock Test' });
   };
 
   const startTest = () => {
@@ -78,6 +82,7 @@ export default function Home() {
             examName={EXAMS.find(e => e.id === selectedExam)?.name || ''} 
             questionCount={config.count}
             difficulty={config.difficulty}
+            subject={config.subject}
             onBack={() => {
               setSelectedExam(null);
               setConfig(null);
@@ -100,13 +105,55 @@ export default function Home() {
             zIndex: 1000,
             padding: '3rem',
             width: '100%',
-            maxWidth: '500px',
+            maxWidth: '550px',
             textAlign: 'center'
           }}
         >
           <h2 style={{ marginBottom: '2rem' }}>Configure Your {EXAMS.find(e => e.id === selectedExam)?.name} Test</h2>
           
-          <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
+          <div style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Focus Area (Subject)</label>
+            <select 
+              value={tempConfig.subject}
+              onChange={(e) => setTempConfig({ ...tempConfig, subject: e.target.value })}
+              style={{ 
+                width: '100%', 
+                padding: '0.75rem', 
+                borderRadius: '12px', 
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff',
+                cursor: 'pointer',
+                outline: 'none'
+              }}
+            >
+              <option value="Full Mock Test" style={{ background: '#1a1a1a' }}>Full Mock Test</option>
+              {selectedExam === 'jee' && (
+                <>
+                  <option value="Physics" style={{ background: '#1a1a1a' }}>Physics</option>
+                  <option value="Chemistry" style={{ background: '#1a1a1a' }}>Chemistry</option>
+                  <option value="Mathematics" style={{ background: '#1a1a1a' }}>Mathematics</option>
+                </>
+              )}
+              {selectedExam === 'neet' && (
+                <>
+                  <option value="Biology" style={{ background: '#1a1a1a' }}>Biology</option>
+                  <option value="Physics" style={{ background: '#1a1a1a' }}>Physics</option>
+                  <option value="Chemistry" style={{ background: '#1a1a1a' }}>Chemistry</option>
+                </>
+              )}
+              {selectedExam === 'upsc' && (
+                <>
+                  <option value="History" style={{ background: '#1a1a1a' }}>History</option>
+                  <option value="Polity" style={{ background: '#1a1a1a' }}>Polity</option>
+                  <option value="Economy" style={{ background: '#1a1a1a' }}>Economy</option>
+                  <option value="Geography" style={{ background: '#1a1a1a' }}>Geography</option>
+                </>
+              )}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Difficulty Level</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
               {['Easy', 'Medium', 'Hard', 'Expert'].map(d => (

@@ -6,9 +6,10 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export async function POST(request: Request) {
   try {
-    const { examName, count, difficulty } = await request.json();
+    const { examName, count, difficulty, subject } = await request.json();
 
-    const prompt = `Generate ${count} practice questions for the ${examName} exam with ${difficulty} difficulty. 
+    const subjectText = subject && subject !== 'Full Mock Test' ? `specifically for the subject "${subject}"` : '';
+    const prompt = `Generate ${count} practice questions for the ${examName} exam ${subjectText} with ${difficulty} difficulty. 
   Each question should match the actual exam pattern and ${difficulty} difficulty level.
   IMPORTANT: Use LaTeX for all mathematical formulas, symbols, and variables (e.g., use $E=mc^2$ instead of E=mc2).
   Return the output strictly as a JSON array of objects with the following structure:
