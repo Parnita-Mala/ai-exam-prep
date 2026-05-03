@@ -24,7 +24,7 @@ export default function Home() {
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
   const [config, setConfig] = useState<{ count: number; difficulty: string; subject: string } | null>(null);
   const [tempConfig, setTempConfig] = useState<{ count: number; difficulty: string; subject: string }>({ 
-    count: 10, 
+    count: 5, 
     difficulty: 'Medium',
     subject: 'Full Mock Test'
   });
@@ -64,7 +64,7 @@ export default function Home() {
 
   const handleSelectExam = (id: string) => {
     setSelectedExam(id);
-    setTempConfig({ count: 10, difficulty: 'Medium', subject: 'Full Mock Test' });
+    setTempConfig({ count: 5, difficulty: 'Medium', subject: 'Full Mock Test' });
   };
 
   const startTest = () => {
@@ -205,8 +205,8 @@ export default function Home() {
 
           <div style={{ marginBottom: '2.5rem', textAlign: 'left' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Number of Questions</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
-              {[10, 20, 30, 50].map(c => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem' }}>
+              {[5, 10, 20, 30, 50].map(c => (
                 <button 
                   key={c}
                   onClick={() => setTempConfig({ ...tempConfig, count: c })}
