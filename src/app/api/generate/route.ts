@@ -27,13 +27,18 @@ export async function POST(request: Request) {
     const response = await result.response;
     const text = response.text();
     
-    // More robust JSON extraction: Find the first '[' and the last ']'
+    console.log("AI Raw Response:", text); // Debugging log
+
+    // More robust JSON extraction
     const startIndex = text.indexOf('[');
     const endIndex = text.lastIndexOf(']');
     
     if (startIndex === -1 || endIndex === -1) {
-      console.error("AI returned invalid format (no JSON array found):", text);
-      return NextResponse.json({ error: "Invalid AI response format" }, { status: 500 });
+      console.error("AI returned invalid format (no JSON array found). Raw response:", text);
+      return NextResponse.json({ 
+        error: "Invalid AI response format",
+        raw: text.slice(0, 500) // Include snippet of raw for debugging
+      }, { status: 500 });
     }
     
     const jsonString = text.substring(startIndex, endIndex + 1);
@@ -41,15 +46,20 @@ export async function POST(request: Request) {
     try {
       const parsed = JSON.parse(jsonString);
       return NextResponse.json(parsed);
-    } catch (parseError) {
-      console.error("JSON Parse Error:", parseError, "Original text:", text);
-      return NextResponse.json({ error: "Failed to parse AI response" }, { status: 500 });
+    } catch (parseError: any) {
+      console.error("JSON Parse Error:", parseError.message, "Original text snippet:", text.slice(0, 500));
+      return NextResponse.json({ 
+        error: "Failed to parse AI response",
+        details: parseError.message,
+        raw: text.slice(0, 500)
+      }, { status: 500 });
     }
   } catch (error: any) {
     console.error("API Route Error:", error);
     return NextResponse.json({ 
       error: "Failed to generate questions",
-      details: error.message 
+      message: error.message,
+      stack: error.stack?.split('\n').slice(0, 3).join('\n')
     }, { status: 500 });
   }
 }
