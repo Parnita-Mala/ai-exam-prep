@@ -39,6 +39,7 @@ const LatexText: React.FC<{ text: string }> = ({ text }) => {
 
 const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, difficulty, subject, onBack }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -51,12 +52,16 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
 
   useEffect(() => {
     async function loadQuestions() {
-      setLoading(true);
-      const aiQuestions = await generateQuestions(examName, questionCount, difficulty, subject);
-      if (aiQuestions.length > 0) {
+      try {
+        setLoading(true);
+        setError(null);
+        const aiQuestions = await generateQuestions(examName, questionCount, difficulty, subject);
         setQuestions(aiQuestions);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadQuestions();
   }, [examName, questionCount, difficulty, subject]);
@@ -80,11 +85,12 @@ const MockTest: React.FC<MockTestProps> = ({ examId, examName, questionCount, di
     );
   }
 
-  if (questions.length === 0) {
+  if (error || questions.length === 0) {
     return (
       <div className={styles.errorContainer}>
         <h2>Failed to generate questions</h2>
-        <p>Please check your API key or try again later.</p>
+        <p style={{ color: '#ef4444', marginBottom: '1rem' }}>{error || 'An unexpected error occurred'}</p>
+        <p>Please check your API key in Vercel settings or try again later.</p>
         <button onClick={onBack} className={styles.backBtn}>Back to Dashboard</button>
       </div>
     );

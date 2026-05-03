@@ -18,12 +18,14 @@ export async function generateQuestions(examName: string, count: number = 10, di
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to generate questions: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Server error: ${response.status}`);
     }
 
-    return await response.json();
-  } catch (error) {
+    const data = await response.json();
+    return data.questions || data;
+  } catch (error: any) {
     console.error("Error generating questions:", error);
-    return [];
+    throw error;
   }
 }
