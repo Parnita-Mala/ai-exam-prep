@@ -12,7 +12,11 @@ const model = genAI.getGenerativeModel({
     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
     { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
     { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-  ]
+  ],
+  generationConfig: {
+    responseMimeType: "application/json",
+    maxOutputTokens: 8192,
+  }
 });
 
 export async function POST(request: Request) {
@@ -44,22 +48,10 @@ export async function POST(request: Request) {
     
     console.log("AI Raw Response:", text); // Debugging log
 
-    // More robust JSON extraction
-    const startIndex = text.indexOf('[');
-    const endIndex = text.lastIndexOf(']');
-    
-    if (startIndex === -1 || endIndex === -1) {
-      console.error("AI returned invalid format (no JSON array found). Raw response:", text);
-      return NextResponse.json({ 
-        error: "Invalid AI response format",
-        raw: text.slice(0, 500) // Include snippet of raw for debugging
-      }, { status: 500 });
-    }
-    
-    const jsonString = text.substring(startIndex, endIndex + 1);
-    
+    // Parse the pure JSON response
     try {
-      const parsed = JSON.parse(jsonString);
+      // The API now guarantees pure JSON because of responseMimeType
+      const parsed = JSON.parse(text);
       return NextResponse.json(parsed);
     } catch (parseError: any) {
       console.error("JSON Parse Error:", parseError.message, "Original text snippet:", text.slice(0, 500));
