@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
+export const maxDuration = 60; // Extend Vercel timeout to 60 seconds
+
 const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey || "");
 const model = genAI.getGenerativeModel({ 
